@@ -17,7 +17,7 @@ import {
 
 export default function DashboardDemo() {
   const mrr = useMemo(() => generateDemoData(), []);
-  const visitors = useMemo(() => generateDemoData(), []);
+  const visitors = useMemo(() => generateDemoData(), []);  
   const returningVisitors = useMemo(() => generateDemoData(), []);
   const churn = useMemo(() => generateDemoData(), []);
   const netRevenue = useMemo(() => generateDemoData(), []);

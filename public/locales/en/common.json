@@ -1,10 +1,10 @@
 {
-  "dashboardTabLabel": "Dashboard",
+  "dashboardTabLabel": "Home",
   "organizationSettingsTabLabel": "Organization",
   "settingsTabLabel": "Settings",
   "profileSettingsTabLabel": "Profile",
   "subscriptionSettingsTabLabel": "Subscription",
-  "dashboardTabDescription": "An overview of your organization's activity and performance across all your projects.",
+  "dashboardTabDescription": "",
   "settingsTabDescription": "Manage your settings and preferences.",
   "emailAddress": "Email Address",
   "password": "Password",

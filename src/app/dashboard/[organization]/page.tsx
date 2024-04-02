@@ -8,7 +8,7 @@ import Trans from '~/core/ui/Trans';
 import Button from '~/core/ui/Button';
 import { PageBody } from '~/core/ui/Page';
 
-const DashboardDemo = loadDynamic(() => import('./components/DashboardDemo'), {
+const Submissions = loadDynamic(() => import('./components/Submissions'), {
   ssr: false,
   loading: () => (
     <div
@@ -37,15 +37,15 @@ function DashboardPage() {
         title={<Trans i18nKey={'common:dashboardTabLabel'} />}
         description={<Trans i18nKey={'common:dashboardTabDescription'} />}
       >
-        <Button size={'sm'} variant={'outline'}>
+        {/* <Button size={'sm'} variant={'outline'}>
           <PlusCircleIcon className={'w-4 mr-2'} />
 
           <span>Add Widget</span>
-        </Button>
+        </Button> */}
       </AppHeader>
 
       <PageBody>
-        <DashboardDemo />
+        <Submissions />
       </PageBody>
     </>
   );
