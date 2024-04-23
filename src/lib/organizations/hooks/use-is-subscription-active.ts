@@ -13,8 +13,10 @@ function useIsSubscriptionActive() {
   if (!status) {
     return false;
   }
+  console.log(status)
 
   return ACTIVE_STATUSES.includes(status);
+  
 }
 
 export default useIsSubscriptionActive;

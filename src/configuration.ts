@@ -10,12 +10,12 @@ enum Themes {
 
 const configuration = {
   site: {
-    name: 'Sallio',
-    description: 'Sallio',
+    name: 'Hermes',
+    description: 'Optimize your Outreach',
     themeColor: '#ffffff',
     themeColorDark: '#0a0a0a',
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
-    siteName: 'Awesomely',
+    siteName: 'Hermes',
     twitterHandle: '',
     githubHandle: '',
     convertKitFormId: '',
@@ -73,73 +73,72 @@ const configuration = {
     embedded: true,
     displayMode: StripeCheckoutDisplayMode.Popup,
     products: [
-      {
-        name: 'Basic',
-        description: 'Description of your Basic plan',
-        badge: `Up to 20 users`,
-        features: [
-          'Basic Reporting',
-          'Up to 20 users',
-          '1GB for each user',
-          'Chat Support',
-        ],
-        plans: [
-          {
-            name: 'Monthly',
-            price: '$9',
-            stripePriceId: 'price_1NNwYHI1i3VnbZTqI2UzaHIe',
-          },
-          {
-            name: 'Yearly',
-            price: '$90',
-            stripePriceId: 'basic-plan-yr',
-          },
-        ],
-      },
+      // {
+      //   name: 'Basic',
+      //   description: 'Description of your Basic plan',
+      //   badge: `Up to 20 users`,
+      //   features: [
+      //     'Basic Reporting',
+      //     'Up to 20 users',
+      //     '1GB for each user',
+      //     'Chat Support',
+      //   ],
+      //   plans: [
+      //     {
+      //       name: 'Monthly',
+      //       price: '$9',
+      //       stripePriceId: 'price_1NNwYHI1i3VnbZTqI2UzaHIe',
+      //     },
+      //     {
+      //       name: 'Yearly',
+      //       price: '$90',
+      //       stripePriceId: 'basic-plan-yr',
+      //     },
+      //   ],
+      // },
       {
         name: 'Pro',
         badge: `Most Popular`,
         recommended: true,
-        description: 'Description of your Pro plan',
+        description: 'Unlock access to platform',
         features: [
-          'Advanced Reporting',
-          'Up to 50 users',
-          '5GB for each user',
-          'Chat and Phone Support',
+          'Instantly find company contacts',
+          'Unlimited CSV imports/exports',
+          'Premium support',
         ],
         plans: [
           {
             name: 'Monthly',
-            price: '$29',
-            stripePriceId: 'pro-plan-mth',
+            price: '$25',
+            stripePriceId: 'price_1P3OubP8YioR7jtx1u4CXSS6',
           },
-          {
-            name: 'Yearly',
-            price: '$200',
-            stripePriceId: 'pro-plan-yr',
-          },
+          // {
+          //   name: 'Yearly',
+          //   price: '$200',
+          //   stripePriceId: 'pro-plan-yr',
+          // },
         ],
       },
-      {
-        name: 'Premium',
-        description: 'Description of your Premium plan',
-        badge: ``,
-        features: [
-          'Advanced Reporting',
-          'Unlimited users',
-          '50GB for each user',
-          'Account Manager',
-        ],
-        plans: [
-          {
-            name: '',
-            price: 'Contact us',
-            stripePriceId: '',
-            label: `Contact us`,
-            href: `/contact`,
-          },
-        ],
-      },
+      // {
+      //   name: 'Premium',
+      //   description: 'Description of your Premium plan',
+      //   badge: ``,
+      //   features: [
+      //     'Advanced Reporting',
+      //     'Unlimited users',
+      //     '50GB for each user',
+      //     'Account Manager',
+      //   ],
+      //   plans: [
+      //     {
+      //       name: '',
+      //       price: 'Contact us',
+      //       stripePriceId: '',
+      //       label: `Contact us`,
+      //       href: `/contact`,
+      //     },
+      //   ],
+      // },
     ],
   },
 };

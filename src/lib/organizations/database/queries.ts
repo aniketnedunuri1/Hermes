@@ -11,6 +11,8 @@ import type UserData from '~/core/session/types/user-data';
 
 type Client = SupabaseClient<Database>;
 
+
+
 /**
  * Query to fetch the organization data from the Database
  * Returns the organization data and the subscription data
@@ -216,4 +218,25 @@ export async function getMembersAuthMetadata(
   );
 
   return users.filter(Boolean) as User[];
+}
+
+
+/**
+ * @name checkUserSubscription
+ * @param client
+ * @param userIds
+ */
+export async function checkUserSubscription(client: Client, userId: string) {
+  const { data, error } = await client
+    .from('subscriptions') // Assuming 'subscriptions' is your table name
+    .select('status') // Select the subscription status
+    .eq('user_id', userId) // Match the user ID
+    .single(); // Assuming one subscription per user for simplicity
+
+  if (error) {
+    console.error('Error fetching subscription:', error);
+    return false; // Handle error appropriately in your application
+  }
+
+  return data && data.status === 'active'; // Check if the subscription is active
 }

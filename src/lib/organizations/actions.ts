@@ -207,6 +207,7 @@ export const transferOrganizationOwnershipAction = withSession(
 
 export const inviteMembersToOrganizationAction = withSession(
   async (payload: z.infer<ReturnType<typeof getInviteMembersBodySchema>>) => {
+    console.log('gi')
     const { invites, organizationUid } =
       await getInviteMembersBodySchema().parseAsync(payload);
 
@@ -214,6 +215,8 @@ export const inviteMembersToOrganizationAction = withSession(
       throw new Error(`Organization not found`);
     }
 
+    console.log('ouid', organizationUid)
+    console.log('inv', invites)
     const logger = getLogger();
     const client = getSupabaseServerActionClient();
     const session = await requireSession(client);
@@ -237,6 +240,7 @@ export const inviteMembersToOrganizationAction = withSession(
     try {
       // send requests to invite members
       await inviteMembers(params);
+      
 
       logger.info(
         {

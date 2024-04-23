@@ -34,6 +34,7 @@ const InviteMembersFormContainer = () => {
         }
 
         const id = toast.loading(t('organization:inviteMembersLoading'));
+        
 
         try {
           await inviteMembersToOrganizationAction({
@@ -45,6 +46,7 @@ const InviteMembersFormContainer = () => {
             id,
           });
         } catch (e) {
+          
           toast.error(t('organization:inviteMembersError'), {
             id,
           });

@@ -137,7 +137,7 @@ function OrganizationsPageHeader() {
     <PageHeader
       title={
         <div className={'flex space-x-4 items-center'}>
-          <LogoImage />
+          {/* <LogoImage /> */}
 
           <span>
             <Trans i18nKey={'common:yourOrganizations'} />

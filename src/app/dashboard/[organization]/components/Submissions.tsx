@@ -168,7 +168,7 @@
 //   );
 // }
 
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useRef, createRef} from 'react';
 import InputFile from '~/core/ui/InputFile';
 import Button from '~/core/ui/Button'; 
 import TextField from '~/core/ui/TextField';
@@ -177,11 +177,21 @@ import {
   Table,
   TableBody,
   TableCell,
+  EditableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '~/core/ui/Table';
+import {
+  Tabs, 
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+}
+from '~/core/ui/Tabs';
 import Tile from '~/core/ui/Tile';
+import useIsSubscriptionActive from '~/lib/organizations/hooks/use-is-subscription-active';
+import Label from '~/core/ui/Label';
 
 export default function Submissions() {
 
@@ -195,17 +205,138 @@ export default function Submissions() {
     Status: string; // assuming this should match the 'Email Status' or similar
   }
 
-  interface Inputs {
+  // interface Inputs {
+  //   id: number;
+  //   Domain: string;
+  // }
+
+  //EDITABLE INPUT TABLE
+  interface EditableRow {
     id: number;
-    Domain: string;
+    content: string;
+  }
+
+
+  const [rows, setRows] = useState(Array.from({ length: 10 }, (_, index) => ({
+    id: index,
+    content: "",
+    isEditing: index === 0 // Start with the first cell being editable for example
+  })));
+  
+
+  
+
+  // Adding rows to input table
+  const addRows = () => {
+    // Generate 10 new rows
+    const newRows = Array.from({ length: 10 }, (_, index) => ({
+      id: rows.length + index, // Ensure unique IDs for new rows
+      content: ""
+    }));
+  
+    setRows(currentRows => [
+      ...currentRows,
+      ...newRows // Add the new rows to the existing rows
+    ]);
+  };
+
+  
+
+  const handleCellChange = (id, newContent) => {
+    // This function should update the content of the row with the specified ID
+    setRows(rows.map(row => row.id === id ? {...row, content: newContent} : row));
+  };
+  
+  const handleEnterPress = (id) => {
+    // Find the index of the current row
+    const currentIndex = rows.findIndex(row => row.id === id);
+    // Set the next row as editable, and ensure the current row is no longer editable
+    setRows(rows.map((row, index) => ({
+      ...row,
+      isEditing: index === currentIndex + 1
+    })));
+  };
+  
+  const makeCellEditable = (id) => {
+    // Set the clicked cell as editable
+    setRows(rows.map(row => ({
+      ...row,
+      isEditing: row.id === id
+    })));
+  };
+
+
+ 
+
+
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+// When rows change, update refs
+  useEffect(() => {
+    inputRefs.current = inputRefs.current.slice(0, rows.length);
+  }, [rows]);
+
+  const moveToNextCell = (currentId: number) => {
+    const nextId = currentId + 1;
+    const nextInputRef = inputRefs.current[nextId];
+    if (nextInputRef) {
+      nextInputRef.focus(); // Ensure this ref points to an input element
+    } else {
+      // Handle case where next cell is not focusable (e.g., last cell)
+    }
+  };
+
+      
+      
+    
+  const isSubscriptionActive = useIsSubscriptionActive();
+
+  if (!isSubscriptionActive) {
+   
+    return (
+      <div>
+        <p>Your subscription is not active. Please visit the subscriptions page to sign up or renew your subscription.</p>
+        {/* Link to the subscription page or render a modal */}
+      </div>
+    );
   }
 
 
   const [file, setFile] = useState<File | null>(null);
   const [apiKey, setApiKey] = useState('');
+  const [numberContacts, setNumberContacts] = useState(1)
   const [tableData, setTableData] = useState<Person[]>([]);
+  const [inputMethod, setInputMethod] = useState('hermestable');
   
   const [tags, setTags] = useState([])
+
+  const exportToCsv = (tableData) => {
+    // Define CSV headers based on your tableData structure
+    const headers = ['ID', 'Company', 'Name', 'Email', 'Linkedin', 'Title', 'Status'];
+    
+    // Convert table data to CSV rows
+    const csvRows = tableData.map(row => 
+      headers.map(fieldName => JSON.stringify(row[fieldName], (_, value) => value || '')).join(',')
+    );
+    
+    // Add header row at the beginning
+    csvRows.unshift(headers.join(','));
+    
+    // Combine all rows with new lines
+    const csvString = csvRows.join('\n');
+    
+    // Convert CSV string to Blob
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    
+    // Create a link and trigger the download
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', 'export.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
 
   
 
@@ -230,50 +361,120 @@ export default function Submissions() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    // call API with file, API key and any other params
-    e.preventDefault()
-    console.log(apiKey)
-    if(!file) {
-      alert("Please select file to upload")
-      return; 
-    }
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   // call API with file, API key and any other params
+  //   e.preventDefault()
+  //   console.log(apiKey)
+  //   if(!file) {
+  //     alert("Please select file to upload")
+  //     return; 
+  //   }
 
-    const formData = new FormData();
+  //   const formData = new FormData();
 
   
-    // formData.append('api_key', apiKey)
-    formData.append('api_key', apiKey);
-    formData.append('file', file)
+  //   // formData.append('api_key', apiKey)
+  //   formData.append('api_key', apiKey);
+  //   formData.append('file', file)
     
-    tags.forEach(tag => {
-      formData.append('tags', tag);
-    });
+  //   tags.forEach(tag => {
+  //     formData.append('tags', tag);
+  //   });
 
     
 
+  //   try {
+  //     const response = await fetch('http://127.0.0.1:8000/search', {
+  //       method: 'POST',
+  //       // headers: {
+  //       //   'X-API-KEY': apiKey, // Sending API key as a header
+  //       // },
+  //       body: formData,
+  //       // Headers not needed for FormData; the browser sets it automatically
+  //     });
+  
+  //     if (!response.ok) throw new Error('Network response was not ok.');
+      
+  //     const data = await response.json();
+  //     console.log(data)
+      
+  //     setTableData(data); // Update the table data state with the received JSON
+  //   } catch (error) {
+  //     console.error('Error during submission:', error);
+  //   }
+
+  //   // display response data
+  // }
+
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      console.log("handle submit")
+
+      if (inputMethod === 'hermestable') {
+        // Convert editableRows data to CSV and submit
+          // Step 1: Gather data
+          console.log("he")
+      const dataToConvertToCSV = rows.map(row => [row.content]);
+
+      // Step 2: Convert data to CSV string
+      const csvContent = dataToConvertToCSV.map(e => e.join(",")).join("\n");
+
+      // Optionally, add a header row if needed
+      const csvHeader = "Company\n"; // Adjust based on your columns
+      const csvData = csvHeader + csvContent;
+
+      console.log(csvData)
+
+      // Convert CSV string to Blob for file creation
+      const csvBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+
+      // You can create a FormData object and append the file if your backend expects a form-data request
+      formData.append("file", csvBlob, "inputData.csv");
+      } else if (inputMethod === 'csv') {
+        if (!file) {
+          console.log("Here")
+          alert("Please select a file to up.");
+          return;
+        }
+        formData.append("file", file, "inputData.csv");
+
+
+        
+        
+        
+        // Submit the uploaded file
+    }
+
+   
+  
+   
+    
+    // Include other data as needed
+    formData.append("api_key", apiKey);
+    // If tags are supposed to be sent as well
+    tags.forEach(tag => formData.append("tags", tag));
+    console.log(formData)
+
+    formData.append("num_contacts_per_company", numberContacts.toString());
+  
+    // Step 3: Send CSV data to your backend
     try {
       const response = await fetch('http://127.0.0.1:8000/search', {
         method: 'POST',
-        // headers: {
-        //   'X-API-KEY': apiKey, // Sending API key as a header
-        // },
         body: formData,
-        // Headers not needed for FormData; the browser sets it automatically
       });
   
       if (!response.ok) throw new Error('Network response was not ok.');
-      
-      const data = await response.json();
-      console.log(data)
-      
-      setTableData(data); // Update the table data state with the received JSON
+  
+      const resultData = await response.json();
+      console.log(resultData);
+      setTableData(resultData); // Update table data state with response
+      // Handle the response data as needed
     } catch (error) {
       console.error('Error during submission:', error);
     }
-
-    // display response data
-  }
+  };
 
   return (
     <div className={'flex flex-col space-y-6 pb-36 '}>
@@ -285,32 +486,11 @@ export default function Submissions() {
       
    
     <form onSubmit={handleSubmit}>
-
-      <div className={'flex flex-col space-y-6 pb-8'}>
-        <TagInput selected={tags} setSelected={setTags} />
-
-
-      </div>
-
-      
-          {/* <TextField
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-          /> */}
-          
-          {/* <TextField
-            label="Paste Your Apollo API Key Here"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)} 
-          /> */}
-
-          
-
-            <div className={'flex flex-col space-y-6 pb-6'}>
+          <div className={'flex flex-col space-y-6 pb-6'}>
             <TextField>
               <TextField.Label> Paste Your Apollo API Key Here</TextField.Label>
               <TextField.Input
-                type = "text"  
+                type = "text"
                 value = {apiKey}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setApiKey(event.target.value)}
               />     
@@ -318,11 +498,110 @@ export default function Submissions() {
 
 
             </div>
-            
-            <div className={'flex flex-col space-y-6 pb-6'}>
-              <InputFile onChange={handleFileChange} />
-              
+
+            <div className={'flex flex-col space-y-6 pb-8'}>
+              <TagInput selected={tags} setSelected={setTags} />
+
+
             </div>
+                
+
+            <div className={'flex flex-col space-y-6 pb-6'}>
+            <TextField>
+              <TextField.Label> Number of contacts you want per company</TextField.Label>
+              <TextField.Input
+                type = "number"
+                value = {numberContacts}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setNumberContacts(event.target.value)}
+              />     
+            </TextField>     
+           
+
+
+            </div>
+            
+            
+
+
+            {/* Tabs */}
+            <Tabs defaultValue="account" className="w-full max-w-xl">
+              <TabsList className="grid grid-cols-2 gap-5">
+                {/* <TabsTrigger value="hermestable">Hermes Input Table</TabsTrigger> */}
+                <TabsTrigger onClick={() => setInputMethod('hermestable')} value="hermestable">Hermes Input Table</TabsTrigger>
+                <TabsTrigger onClick={() => setInputMethod('csv')} value="csv">Input CSV</TabsTrigger>
+              </TabsList>
+                <TabsContent value="hermestable">
+                    <div className={'flex flex-col space-y-6'}>
+                    <div>
+                    <Button onClick={addRows}>Add 10 Rows</Button>
+                    </div>
+
+                    <div className="scrollable-table-container" style={{ maxHeight: "500px", overflowY: "auto" }}>
+                    <Tile>
+                    <Tile.Heading> Input Table </Tile.Heading>
+                    <Tile.Body> 
+
+                    <Table>
+                    <TableHeader>
+                    <TableRow>
+                    <TableHead> Company Domain (e.g. google.com - do not include https, www, or any other part of the URL here) </TableHead>
+                    </TableRow>
+
+                    </TableHeader>
+
+                    <TableBody>
+                    {rows.map((row) => (
+                      <TableRow key={row.id}>
+                      
+
+                        <EditableCell
+                          key={row.id}
+                          editable={true}
+                          value={row.content}
+                          onChange={handleCellChange}
+                          onEnter={handleEnterPress}
+                          isEditing={row.isEditing}
+                          id={row.id}
+                          makeCellEditable={makeCellEditable} 
+                        />
+                      
+                      </TableRow>
+                    ))}
+                    </TableBody>
+                    </Table>
+                    </Tile.Body>
+                    </Tile>
+                    </div>
+                    </div>
+
+
+
+
+                </TabsContent>
+
+                <TabsContent value="csv">
+                  <div className={'flex flex-col space-y-6 pb-6'}>
+                  <Label> Input a csv file below in the following format:
+
+
+                  </Label>
+                  <InputFile onChange={handleFileChange} />
+
+                  </div>
+
+                </TabsContent>
+
+              
+
+
+
+              
+            </Tabs>
+
+
+        
+
+            
 
 
           <Button type="submit">Submit</Button>
@@ -331,8 +610,14 @@ export default function Submissions() {
     
 
     </div>
+
+
+    
+
     <div className = {'flex flex-1 items-center w-full h-full justify-center flex-col space-y-4' +
         ' py-24'}>
+
+      <Button onClick={() => exportToCsv(tableData)}>Export to CSV</Button>
         
       <Tile>
         <Tile.Heading> Contacts Table </Tile.Heading>
@@ -384,6 +669,9 @@ export default function Submissions() {
 
 
       </div>
+      
+
+
     
  
     </div>
